@@ -1,7 +1,7 @@
 import "./TaskList.css"
 import Task from '../Task/Task'
 
-function TaskList({tasks, toggleTask, deleteTask, editingTask}) {
+function TaskList({tasks, toggleTask, deleteTask, editingTask, updateTask}) {
     return (
         <ul className="todo-list">
             {tasks.map ((task) => (<Task
@@ -14,6 +14,7 @@ function TaskList({tasks, toggleTask, deleteTask, editingTask}) {
             deleteTask={deleteTask}
             editingTask={editingTask}
             editing={task.editing}
+            updateTask={updateTask}
         />))}
        
         </ul>

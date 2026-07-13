@@ -91,6 +91,10 @@ function App() {
     );
   }
 
+  function closeEditingTask(id) {
+    setTasks((tasks))
+  };
+
   return (
     <section className="todoapp">
       <header className="header">
@@ -103,6 +107,7 @@ function App() {
           toggleTask={toggleTask}
           deleteTask={deleteTask}
           editingTask={editingTask}
+          updateTask={updateTask}
         />
         <Footer />
       </section>

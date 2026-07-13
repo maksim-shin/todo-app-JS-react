@@ -10,6 +10,7 @@ function Task({
   deleteTask,
   editingTask,
   editing,
+  updateTask,
 }) {
   return (
    <li className={editing ? "editing" : status}>
@@ -44,10 +45,16 @@ function Task({
         type="text"
         className="edit"
         value={description}
-        onChange={() => {
-          editingTask(id, true);
+        onChange={(event) => {
+          const text = event.target.value;
+          updateTask(id, text)
         }}
-        
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            editingTask(id, false)
+          }
+        }
+      }
       />
     </li>
   );

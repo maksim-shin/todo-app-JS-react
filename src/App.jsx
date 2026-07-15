@@ -11,28 +11,24 @@ function App() {
       description: "Completed task",
       created: "created 17 seconds ago",
       status: "completed",
-      editing: false,
     },
     {
       id: 2,
       description: "Editing task",
       created: "created 5 minutes ago",
       status: "active",
-      editing: true,
     },
     {
       id: 3,
       description: "Active task",
       created: "created 5 minutes ago",
       status: "active",
-      editing: false,
     },
     {
       id: 4,
       description: "test",
       created: "created 999 minutes ago",
       status: "active",
-      editing: false,
     },
   ]);
 
@@ -46,9 +42,9 @@ function App() {
           };
         }
         return task;
-      }),
+      })
     );
-  }
+  };
 
   function deleteTask(id) {
     setTasks(
@@ -56,26 +52,9 @@ function App() {
         if (task.id !== id) {
           return task;
         }
-      }),
+      })
     );
-  }
-
-  function editingTask(id, isEditing) {
-    setTasks((tasks) =>
-      tasks.map((task) => {
-        if (task.id === id) {
-          return {
-            ...task,
-            editing: isEditing,
-          };
-        }
-        return {
-          ...task,
-          editing: false,
-        };
-      }),
-    );
-  }
+  };
 
   function updateTask(id, text) {
     setTasks((tasks) =>
@@ -89,11 +68,9 @@ function App() {
         return task;
       })
     );
-  }
-
-  function closeEditingTask(id) {
-    setTasks((tasks))
   };
+
+  const [editingId, setEditingId] = useState(null);
 
   return (
     <section className="todoapp">
@@ -106,8 +83,9 @@ function App() {
           tasks={tasks}
           toggleTask={toggleTask}
           deleteTask={deleteTask}
-          editingTask={editingTask}
           updateTask={updateTask}
+          editingId={editingId}
+          setEditingId={setEditingId}
         />
         <Footer />
       </section>

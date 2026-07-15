@@ -8,12 +8,22 @@ function Task({
   created,
   toggleTask,
   deleteTask,
-  editingTask,
-  editing,
   updateTask,
+  editingId,
+  setEditingId
 }) {
+
+  function updateText(event) {
+    const text = event.target.value;
+    updateTask(id, text)
+  };
+
+  function closeEditingMode (event) {
+    if (event.key === "Enter") {setEditingId(null)}
+  };
+  
   return (
-   <li className={editing ? "editing" : status}>
+   <li className={editingId === id ? "editing" : status}>
       <div className="view">
         <input
           className="toggle"
@@ -30,31 +40,19 @@ function Task({
         </label>
         <button
           className="icon icon-edit"
-          onClick={() => {
-            editingTask(id, true);
-          }}
+          onClick={() => setEditingId(id)}
         ></button>
         <button
           className="icon icon-destroy"
-          onClick={() => {
-            deleteTask(id);
-          }}
+          onClick={() => {deleteTask(id)}}
         ></button>
       </div>
       <input
         type="text"
         className="edit"
         value={description}
-        onChange={(event) => {
-          const text = event.target.value;
-          updateTask(id, text)
-        }}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            editingTask(id, false)
-          }
-        }
-      }
+        onChange={updateText}
+        onKeyDown={closeEditingMode}
       />
     </li>
   );

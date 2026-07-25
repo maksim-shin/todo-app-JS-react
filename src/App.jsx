@@ -3,9 +3,11 @@ import TaskList from "./components/TaskList/TaskList";
 import NewTaskForm from "./components/NewTaskForm/NewTaskForm";
 import Footer from "./components/Footer/Footer";
 import { useEffect, useState } from "react";
+import {v4 as uuid4} from "uuid"
 
 
 function App() {
+
   const [tasks, setTasks] = useState([]);
 
   // -----check box (active or completed)-----
@@ -21,6 +23,20 @@ function App() {
         return task;
       })
     );
+  };
+
+  // -----add new task-----
+  
+
+  function addTask(text) {
+    const newTask = {
+      id: uuid4(),
+      created: new Date(),
+      description: text,
+      status: "active",
+    };
+
+    setTasks((tasks) => [newTask, ...tasks]);
   };
 
   // -----delete task-----
@@ -103,7 +119,10 @@ function App() {
     <section className="todoapp">
       <header className="header">
         <h1>todos</h1>
-        <NewTaskForm />
+        <NewTaskForm 
+          addTask={addTask}
+        />
+
       </header>
       <section className="main">
         <TaskList
@@ -114,6 +133,7 @@ function App() {
           editingId={editingId}
           setEditingId={setEditingId}
           filteredTasks={filteredTasks}
+          
         />
         <Footer
           filter={filter}

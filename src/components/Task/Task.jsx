@@ -19,7 +19,10 @@ function Task({
   };
 
   function closeEditingMode (event) {
+     console.log(event.key);
     if (event.key === "Enter") {setEditingId(null)}
+   
+    
   };
   
   return (

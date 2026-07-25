@@ -1,16 +1,16 @@
 import "./TasksFilter.css"
 
-function TasksFilter() {
+function TasksFilter({filter, setFilter}) {
     return (
         <ul className="filters">
             <li>
-                <button className="selected">All</button>
+                <button onClick={() => setFilter("all")} className={filter === "all" ? "selected" : ""}>All</button>
             </li>
             <li>
-                <button>Active</button>
+                <button onClick={() => setFilter("active")} className={filter === "active" ? "selected" : ""}>Active</button>
             </li>
             <li>
-                <button>Completed</button>
+                <button onClick={() => setFilter("completed")} className={filter === "completed" ? "selected" : ""}>Completed</button>
             </li>
         </ul>
     );

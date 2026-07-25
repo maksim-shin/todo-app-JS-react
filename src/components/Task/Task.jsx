@@ -34,8 +34,7 @@ function Task({
         <label>
           <span className="description">{description}</span>
           <span className="created">
-            {created}
-            {/* {format(created, "HH:mm")} */}
+            {format(created, "HH:mm")}
           </span>
         </label>
         <button

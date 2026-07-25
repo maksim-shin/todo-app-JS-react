@@ -2,38 +2,15 @@ import "./App.css";
 import TaskList from "./components/TaskList/TaskList";
 import NewTaskForm from "./components/NewTaskForm/NewTaskForm";
 import Footer from "./components/Footer/Footer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 
 function App() {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      description: "Completed task",
-      created: "created 17 seconds ago",
-      status: "completed",
-    },
-    {
-      id: 2,
-      description: "Editing task",
-      created: "created 5 minutes ago",
-      status: "active",
-    },
-    {
-      id: 3,
-      description: "Active task",
-      created: "created 5 minutes ago",
-      status: "active",
-    },
-    {
-      id: 4,
-      description: "test",
-      created: "created 999 minutes ago",
-      status: "active",
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
 
+  // -----check box (active or completed)-----
   function toggleTask(id) {
-    setTasks(
+    setTasks((tasks) => 
       tasks.map((task) => {
         if (task.id === id) {
           return {
@@ -46,6 +23,7 @@ function App() {
     );
   };
 
+  // -----delete task-----
   function deleteTask(id) {
     setTasks(
       tasks.filter((task) => {
@@ -56,6 +34,7 @@ function App() {
     );
   };
 
+  // -----update task description-----
   function updateTask(id, text) {
     setTasks((tasks) =>
       tasks.map((task) => {
@@ -72,6 +51,54 @@ function App() {
 
   const [editingId, setEditingId] = useState(null);
 
+  // -----get tasks data-----
+  useEffect(() => {fetchData()}, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("https://jsonplaceholder.typicode.com/todos");
+      const data = await response.json();
+      
+      const formattedData = data.slice(0, 5).map((task) => ({
+        id: task.id,
+        status: task.completed ? "completed" : "active",
+        description: task.title,
+        created: new Date(),
+      }));
+
+      setTasks(formattedData);
+
+    } catch (error) {
+      console.error("Error");
+    }
+  };
+
+  // -----filter-----
+  const[filter, setFilter] = useState("all")
+
+  const filteredTasks = tasks.filter((task) => {
+    if(filter === "active"){
+      return task.status === "active";
+    } else if (filter === "completed") {
+      return task.status === "completed";
+    } else {
+      return task;
+    }
+  })
+
+  // -----active tasks-----
+  const activeTasks = tasks.filter((task) => {
+    return task.status === "active"}).length
+
+  // -----clear completed-----
+  const clearCompleted = () => {setTasks(
+    tasks.filter((task) => {
+      return task.status !== "completed";
+      }
+    )
+  )}
+  
+
   return (
     <section className="todoapp">
       <header className="header">
@@ -80,14 +107,20 @@ function App() {
       </header>
       <section className="main">
         <TaskList
-          tasks={tasks}
+          tasks={filteredTasks}
           toggleTask={toggleTask}
           deleteTask={deleteTask}
           updateTask={updateTask}
           editingId={editingId}
           setEditingId={setEditingId}
+          filteredTasks={filteredTasks}
         />
-        <Footer />
+        <Footer
+          filter={filter}
+          setFilter={setFilter} 
+          activeTasks={activeTasks}
+          clearCompleted={clearCompleted}
+        />
       </section>
     </section>
   );

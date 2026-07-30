@@ -15,8 +15,8 @@ function TaskList({
         <Task
           key={task.id}
           id={task.id}
-          status={task.status}
-          description={task.description}
+          completed={task.completed}
+          title={task.title}
           created={task.created}
           toggleTask={toggleTask}
           deleteTask={deleteTask}

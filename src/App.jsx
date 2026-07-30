@@ -1,149 +1,141 @@
-import "./App.css";
-import TaskList from "./components/TaskList/TaskList";
-import NewTaskForm from "./components/NewTaskForm/NewTaskForm";
-import Footer from "./components/Footer/Footer";
-import { useEffect, useState } from "react";
-import {v4 as uuid4} from "uuid"
+    import "./App.css";
+    import TaskList from "./components/TaskList/TaskList";
+    import NewTaskForm from "./components/NewTaskForm/NewTaskForm";
+    import Footer from "./components/Footer/Footer";
+    import { useEffect, useState } from "react";
 
 
-function App() {
 
-  const [tasks, setTasks] = useState([]);
+    function App() {
 
-  // -----check box (active or completed)-----
-  function toggleTask(id) {
-    setTasks((tasks) => 
-      tasks.map((task) => {
-        if (task.id === id) {
-          return {
-            ...task,
-            status: task.status === "active" ? "completed" : "active",
-          };
+      const [tasks, setTasks] = useState([]);
+      const [filter, setFilter] = useState("all")
+
+      
+      
+
+      // -----check box (active or completed)-----
+      const toggleTask = (id) => {
+        setTasks((tasks) => 
+          tasks.map((task) => {
+            if (task.id === id) {
+              return {
+                ...task,
+                completed: !task.completed,
+              };
+            }
+            return task;
+          })
+        );
+      };
+
+      // -----add new task-----
+      const addTask = (text) => {
+        const newTask = {
+          id: Date.now(),
+          created: new Date(),
+          title: text,
+          completed: false,
+        };
+        setTasks((tasks) => [newTask, ...tasks]);
+      };
+
+      // -----delete task-----
+      const deleteTask = (id) => {
+        setTasks((prevTasks) => 
+          prevTasks.filter((task) => (task.id !== id))
+        ); 
+      };
+
+      // -----update task description-----
+      const updateTask = (id, text) => {
+        setTasks((tasks) =>
+          tasks.map((task) => {
+            if (task.id === id) {
+              return {
+                ...task,
+                title: text,
+              };
+            }
+            return task;
+          })
+        );
+      };
+
+      // -----get tasks data-----
+      const fetchData = async () => {
+        try {
+          const response = await fetch("https://jsonplaceholder.typicode.com/todos");
+
+          if (!response.ok) {
+          throw new Error("Failed to fetch data");
         }
-        return task;
-      })
-    );
-  };
+          const data = await response.json();
 
-  // -----add new task-----
-  
+          setTasks(
+            data.map((task) => ({
+              ...task, 
+              created: new Date(),
+            })).slice(0, 10)
+          );
 
-  function addTask(text) {
-    const newTask = {
-      id: uuid4(),
-      created: new Date(),
-      description: text,
-      status: "active",
-    };
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      };
 
-    setTasks((tasks) => [newTask, ...tasks]);
-  };
+      useEffect(() => {
+        fetchData()
+      }, []);
 
-  // -----delete task-----
-  function deleteTask(id) {
-    setTasks(
-      tasks.filter((task) => {
-        if (task.id !== id) {
+      // -----filter-----
+      const filteredTasks = tasks.filter((task) => {
+        if(filter === "active"){
+          return task.completed === false;
+        } else if (filter === "completed") {
+          return task.completed === true;
+        } else {
           return task;
         }
       })
-    );
-  };
 
-  // -----update task description-----
-  function updateTask(id, text) {
-    setTasks((tasks) =>
-      tasks.map((task) => {
-        if (task.id === id) {
-          return {
-            ...task,
-            description: text,
-          };
-        }
-        return task;
-      })
-    );
-  };
+      // -----active tasks-----
+      const activeTasks = tasks.filter((task) => {
+        return task.completed === false}).length
 
-  const [editingId, setEditingId] = useState(null);
+      // -----clear completed-----
+      const clearCompleted = () => {
+        setTasks((prevTasks) => 
+          prevTasks.filter((task) => task.completed === false)
+        ) 
+      };
 
-  // -----get tasks data-----
-  useEffect(() => {fetchData()}, []);
+      return (
+        <section className="todoapp">
+          <header className="header">
+            <h1>todos</h1>
+            <NewTaskForm 
+              addTask={addTask}
+            />
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch("https://jsonplaceholder.typicode.com/todos");
-      const data = await response.json();
-      
-      const formattedData = data.slice(0, 5).map((task) => ({
-        id: task.id,
-        status: task.completed ? "completed" : "active",
-        description: task.title,
-        created: new Date(),
-      }));
-
-      setTasks(formattedData);
-
-    } catch (error) {
-      console.error("Error");
+          </header> 
+          <section className="main">
+            <TaskList
+              toggleTask={toggleTask}
+              deleteTask={deleteTask}
+              updateTask={updateTask}
+              tasks={filteredTasks}
+              
+            />
+            <Footer
+              filter={filter}
+              setFilter={setFilter} 
+              activeTasks={activeTasks}
+              clearCompleted={clearCompleted}
+            />
+          </section>
+        </section>
+      );
     }
-  };
 
-  // -----filter-----
-  const[filter, setFilter] = useState("all")
-
-  const filteredTasks = tasks.filter((task) => {
-    if(filter === "active"){
-      return task.status === "active";
-    } else if (filter === "completed") {
-      return task.status === "completed";
-    } else {
-      return task;
-    }
-  })
-
-  // -----active tasks-----
-  const activeTasks = tasks.filter((task) => {
-    return task.status === "active"}).length
-
-  // -----clear completed-----
-  const clearCompleted = () => {setTasks(
-    tasks.filter((task) => {
-      return task.status !== "completed";
-      }
-    )
-  )}
-  
-
-  return (
-    <section className="todoapp">
-      <header className="header">
-        <h1>todos</h1>
-        <NewTaskForm 
-          addTask={addTask}
-        />
-
-      </header>
-      <section className="main">
-        <TaskList
-          tasks={filteredTasks}
-          toggleTask={toggleTask}
-          deleteTask={deleteTask}
-          updateTask={updateTask}
-          editingId={editingId}
-          setEditingId={setEditingId}
-          filteredTasks={filteredTasks}
-          
-        />
-        <Footer
-          filter={filter}
-          setFilter={setFilter} 
-          activeTasks={activeTasks}
-          clearCompleted={clearCompleted}
-        />
-      </section>
-    </section>
-  );
-}
-
-export default App;
+    export default App;

@@ -1,6 +1,8 @@
 import "./TasksFilter.css"
 
 function TasksFilter({filter, setFilter}) {
+
+    
     return (
         <ul className="filters">
             <li>

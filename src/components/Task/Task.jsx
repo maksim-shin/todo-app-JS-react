@@ -1,62 +1,78 @@
+  import { useState, useEffect, useRef } from "react";
 import "./Task.css"
-import { format } from "date-fns";
+  import { format } from "date-fns";
 
-function Task({
-  id,
-  status,
-  description,
-  created,
-  toggleTask,
-  deleteTask,
-  updateTask,
-  editingId,
-  setEditingId
-}) {
+  function Task({
+    id,
+    completed,
+    title,
+    created,
+    toggleTask,
+    deleteTask,
+    updateTask,
+  }) {
 
-  function updateText(event) {
-    const text = event.target.value;
-    updateTask(id, text)
-  };
-
-  function closeEditingMode (event) {
-     console.log(event.key);
-    if (event.key === "Enter") {setEditingId(null)}
-   
+    const [editing, setEditing] = useState(false);
+    const [editText, setEditText] = useState(title);
+    const inputRef = useRef(null);
     
-  };
-  
-  return (
-   <li className={editingId === id ? "editing" : status}>
-      <div className="view">
+    const updateText = (event) => {
+      setEditText(event.target.value)
+    };
+
+    const closeEditingMode = (event) => {
+      if (event.key === "Enter") {
+        updateTask(id, editText);
+        setEditing(false);
+      }
+
+      if (event.key === "Escape") {
+        setEditing(false);
+      }
+    };
+
+  useEffect(() => {
+    if (editing) {
+      inputRef.current.focus();
+    }
+  }, [editing]);
+    
+    return (
+    <li className={editing ? "editing" : ""}>
+        <div className="view">
+          <input
+            className="toggle"
+            type="checkbox"
+            checked={completed}
+            onChange={() => toggleTask(id)}
+          />
+          <label>
+            <span className="description">{title}</span>
+            <span className="created">
+              {format(created, "HH:mm")}
+            </span>
+          </label>
+          <button
+            className="icon icon-edit"
+            onClick={() => {
+              setEditText(title);
+              setEditing(true);
+            }}
+          ></button>
+          <button
+            className="icon icon-destroy"
+            onClick={() => {deleteTask(id)}}
+          ></button>
+        </div>
         <input
-          className="toggle"
-          type="checkbox"
-          checked={status === "completed"}
-          onChange={() => toggleTask(id)}
+          ref={inputRef}
+          type="text"
+          className="edit"
+          value={editText}
+          onChange={updateText}
+          onKeyDown={closeEditingMode}
         />
-        <label>
-          <span className="description">{description}</span>
-          <span className="created">
-            {format(created, "HH:mm")}
-          </span>
-        </label>
-        <button
-          className="icon icon-edit"
-          onClick={() => setEditingId(id)}
-        ></button>
-        <button
-          className="icon icon-destroy"
-          onClick={() => {deleteTask(id)}}
-        ></button>
-      </div>
-      <input
-        type="text"
-        className="edit"
-        value={description}
-        onChange={updateText}
-        onKeyDown={closeEditingMode}
-      />
-    </li>
-  );
-}
-export default Task;
+      </li>
+    );}
+  
+  export default Task;
